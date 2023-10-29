@@ -1,8 +1,8 @@
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.*;
 import java.util.*;
 
 public class ExFrame extends JFrame{
@@ -21,6 +21,7 @@ public class ExFrame extends JFrame{
     JPanel outPnl;
         JTextArea outTA;
         JScrollPane outScroll;
+        JButton saveBtn;
 
 
     public ExFrame() {
@@ -30,6 +31,7 @@ public class ExFrame extends JFrame{
 
 
         mainPnl = new JPanel();
+        mainPnl.setLayout(new BorderLayout());
 
         addChooserPnl();
         addOutPnl();
@@ -56,7 +58,7 @@ public class ExFrame extends JFrame{
 
         chooserPnl.add(runButton);
 
-        mainPnl.add(chooserPnl);
+        mainPnl.add(chooserPnl,BorderLayout.NORTH);
 
         runButton.addActionListener(new ActionListener() {
             @Override
@@ -64,6 +66,7 @@ public class ExFrame extends JFrame{
                 bookFile = bookChooser.getSelectedFile();
                 stopFile = stopChooser.getSelectedFile();
                 String temp;
+                outTA.append("Reading file: " + bookFile.getName() + "\n");
 
                 try {
                     Scanner stopSc = new Scanner(stopFile);
@@ -93,7 +96,7 @@ public class ExFrame extends JFrame{
 
                     }
 
-                    
+                    saveBtn.setVisible(true);
 
 
                 } catch (FileNotFoundException ex) {
@@ -108,12 +111,35 @@ public class ExFrame extends JFrame{
     }
     public void addOutPnl(){
         outPnl = new JPanel();
-        outTA = new JTextArea(10,100);
+        outTA = new JTextArea(10,45);
         outScroll = new JScrollPane(outTA);
 
-        outPnl.add(outScroll);
+        saveBtn = new JButton("Save to File");
+        saveBtn.setVisible(false);
 
-        mainPnl.add(outTA);
+
+        outPnl.setBorder(BorderFactory.createEmptyBorder());
+        outPnl.add(outScroll,BorderLayout.CENTER);
+        outPnl.add(saveBtn,BorderLayout.SOUTH);
+
+        mainPnl.add(outPnl,BorderLayout.CENTER);
+
+        saveBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                File outFile = new File(bookFile.getName() + "Freq");
+                try {
+                    FileWriter outWriter = new FileWriter(outFile.getName());
+                    PrintWriter outPrint = new PrintWriter(outWriter);
+
+                    outPrint.print(outTA.getText());
+
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+
+            }
+        });
 
     }
 
